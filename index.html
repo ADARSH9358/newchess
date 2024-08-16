@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Login Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loginSection">
+    <div class="login-container">
+        <h2>Chess Login</h2>
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required placeholder="Enter your name">
+            <label for="email">Room-No:</label>
+            <input type="text" id="email" required placeholder="Enter your Room-No">
+            <input type="submit" value="Login">
+        </form>
+    </div>
+</div>
+    <div id="gameSection" style="display: none;">
+        <div class="container">
+            <div class="player-section">
+                <div class="player-name">Player: John Doe</div>
+                <button class="video-button" id="callButton">Start Video Call</button>
+                <video id="localVideo" class="video" autoplay ></video>
+                <!-- <div id="localVideo" class="video"></div> -->
+            </div>
+    
+            <div class="chessboard"></div>
+    
+            <div class="player-section">
+                <div class="player-name">Opponent: Jane Doe</div>
+                <!-- <div id="remoteVideo" class="video"></div> -->
+                <video id="remoteVideo" class="video" autoplay ></video>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js">
+    </script>
+</body>
+</html>
