@@ -44,6 +44,7 @@ function handleLogin(event) {
         // Store user data in localStorage
         localStorage.setItem("userName", userName);
         localStorage.setItem("userRoom", userRoom);
+        document.querySelector(".player-name").innerText=`You : ${userName}`;
 
         const loginSection = document.getElementById('loginSection');
         const gameSection = document.getElementById('gameSection');
@@ -71,10 +72,6 @@ socket.on('playerColor', (color) => {
     // console.log('You are playing as', color);
 });
 
-// socket.on('initGame', (gameState) => {
-//     // Example: Initialize game state and render the board
-//     console.log('Game initialized', gameState);
-// });
 
 // web rtc
 
@@ -84,6 +81,7 @@ callButton.addEventListener('click', startCall);
 
 async function startCall() {
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true,video: true });
+    localVideo.style.display = "block"; 
     localVideo.srcObject = localStream;
     // localVideo.style.display = "none"; 
     peerConnection = new RTCPeerConnection(config);
@@ -99,6 +97,7 @@ async function startCall() {
         // const remoteAudio = new Audio();
         // remoteAudio.srcObject = event.stream;
         // remoteAudio.play();
+        remoteVideo.style.display = 'block';
         remoteVideo.srcObject = event.stream;
     };
 
@@ -153,7 +152,7 @@ socket.on('updateBoard', (gameState) => {
     console.log(color);
     let ans=gameState.players[color].name;
     console.log(ans);
-    document.getElementById("whosTurn").innerHTML=`<div>It is ${ans} turn</div>`;
+    // document.getElementById("whosTurn").innerHTML=`<div>It is ${ans} turn</div>`;
     
     possibleMoves = [];
     renderBoard(board);
@@ -165,15 +164,20 @@ socket.on('invalidMove', (data) => {
 });
 socket.on('gameOver', (data) => {
     gameState.winner = data.winner;
+    if(data.winner === userName){
+        window.location.href = 'gamewinner.html';
+    }
+    else{
+        window.location.href = 'looser.html';
+    }
+   
     // document.querySelector('.win').innerHTML=`<h1>the winner is ${data.winner}</h1>`;
-    alert(`Game over! The winner is ${data.winner}`);
-
   });
 
 
   socket.on('opponentName', (opponentName) => {
 
-    document.querySelector(".player-name").innerText=opponentName;
+    document.querySelector("#Opponent").innerText=`Opponent : ${opponentName}`;
     // window.location.href = 'chess.html';
 
     // opponentDiv.classList.add('opponenthighlight');
@@ -183,11 +187,19 @@ function renderBoard(board) {
     const chessboard = document.querySelector('.chessboard');
     chessboard.innerHTML = ''; // Clear the chessboard before rendering
 
+    if (playerColor === 'white') {
+        chessboard.classList.add('rotate-board');
+    } else {
+        chessboard.classList.remove('rotate-board');
+    }
+
+
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             // Create a new div for each cell
             const cell = document.createElement('div');
             cell.id = `${col + 1}_${8 - row}`;
+            // cell.className = `gamecell piece ${(row + col) % 2 === 0 ? 'white' : 'grey'}`;
             cell.className = `gamecell ${(row + col) % 2 === 0 ? 'white' : 'grey'}`;
 
             if (board[row][col]) {

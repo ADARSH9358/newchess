@@ -23,12 +23,6 @@ function logToFile(message) {
     });
 }
 
-
-
-// Serve static files from the "public" directory
-
-
-
 app.use(express.static(path.join(__dirname)));
 
 // Serve index.html on the root path
