@@ -36,7 +36,7 @@ socket.on('connect', () => {
 // Handle the login form submission (only on the login page)
 function handleLogin(event) {
     event.preventDefault();
-    
+
     userName = document.getElementById("name").value;
     userRoom = document.getElementById("email").value;
 
@@ -44,7 +44,7 @@ function handleLogin(event) {
         // Store user data in localStorage
         localStorage.setItem("userName", userName);
         localStorage.setItem("userRoom", userRoom);
-        document.querySelector(".player-name").innerText=`You : ${userName}`;
+        document.querySelector(".player-name").innerText = `You : ${userName}`;
 
         const loginSection = document.getElementById('loginSection');
         const gameSection = document.getElementById('gameSection');
@@ -80,8 +80,8 @@ callButton.addEventListener('click', startCall);
 // hangUpButton.addEventListener('click', hangUp);
 
 async function startCall() {
-    localStream = await navigator.mediaDevices.getUserMedia({ audio: true,video: true });
-    localVideo.style.display = "block"; 
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    localVideo.style.display = "block";
     localVideo.srcObject = localStream;
     // localVideo.style.display = "none"; 
     peerConnection = new RTCPeerConnection(config);
@@ -133,6 +133,7 @@ function hangUp() {
 
 
 socket.on('initGame', (gameState) => {
+    console.log(gameState);
     board = gameState.board;
     renderBoard(board);
 
@@ -140,23 +141,23 @@ socket.on('initGame', (gameState) => {
 // io.to(roomState.players.white.id).emit('opponentName', roomState.players.black.name);
 // 
 
-socket.on("roomFull",(mess)=>{
+socket.on("roomFull", (mess) => {
     alert(mess);
-    return ;
+    return;
 })
 socket.on('updateBoard', (gameState) => {
     board = gameState.board;
     // let turnDiv=  document.querySelector('#turn')
     // document.getElementById("whosTurn").style.display = "block"
-    let color=gameState.turn;
+    let color = gameState.turn;
     console.log(color);
-    let ans=gameState.players[color].name;
+    let ans = gameState.players[color].name;
     console.log(ans);
     // document.getElementById("whosTurn").innerHTML=`<div>It is ${ans} turn</div>`;
-    
+
     possibleMoves = [];
     renderBoard(board);
-  
+
 });
 
 socket.on('invalidMove', (data) => {
@@ -164,20 +165,21 @@ socket.on('invalidMove', (data) => {
 });
 socket.on('gameOver', (data) => {
     gameState.winner = data.winner;
-    if(data.winner === userName){
+    if (data.winner === userName) {
         window.location.href = 'gamewinner.html';
     }
-    else{
+    else {
         window.location.href = 'looser.html';
     }
-   
+
     // document.querySelector('.win').innerHTML=`<h1>the winner is ${data.winner}</h1>`;
-  });
+});
 
-
-  socket.on('opponentName', (opponentName) => {
-
-    document.querySelector("#Opponent").innerText=`Opponent : ${opponentName}`;
+let opp = null;
+socket.on('opponentName', (opponentName) => {
+    opp = opponentName;
+    renderBoard(board)
+    document.querySelector("#Opponent").innerText = `Opponent : ${opponentName}`;
     // window.location.href = 'chess.html';
 
     // opponentDiv.classList.add('opponenthighlight');
@@ -193,19 +195,19 @@ function renderBoard(board) {
         chessboard.classList.remove('rotate-board');
     }
 
-
     for (let row = 0; row < 8; row++) {
         for (let col = 0; col < 8; col++) {
             // Create a new div for each cell
             const cell = document.createElement('div');
             cell.id = `${col + 1}_${8 - row}`;
-            // cell.className = `gamecell piece ${(row + col) % 2 === 0 ? 'white' : 'grey'}`;
             cell.className = `gamecell ${(row + col) % 2 === 0 ? 'white' : 'grey'}`;
 
             if (board[row][col]) {
                 // Add piece to the cell
                 cell.innerHTML = `<span class="${board[row][col].type}">${getPieceSymbol(board[row][col])}</span>`;
-                if (!gameState.winner) {
+                console.log("opponent",opp);
+                // Check if opponent exists and the game is not over
+                if (opp && !gameState.winner) {
                     if (board[row][col].color === playerColor) {
                         cell.addEventListener('click', () => selectPiece(row, col));
                     } else {
@@ -213,8 +215,8 @@ function renderBoard(board) {
                     }
                 }
             } else {
-                // Add click event for empty cell if the game is not over
-                if (!gameState.winner) {
+                // Add click event for empty cell if the game is not over and opponent exists
+                if (opp && !gameState.winner) {
                     cell.addEventListener('click', () => movePiece(row, col));
                 }
             }
@@ -249,7 +251,7 @@ function selectPiece(row, col) {
     const piece = board[row][col];
     if (piece && piece.color === playerColor) {
         console.log(piece);
-        console.log(row,col);
+        console.log(row, col);
         socket.emit('getPossibleMoves', { piece, position: selectedPiece });
     }
 }
@@ -265,6 +267,7 @@ function movePiece(row, col) {
             from: selectedPiece,
             to: { row, col }
         };
+        console.log(selectedPiece);
         socket.emit('movePiece', move);
         selectedPiece = null;
         possibleMoves = [];

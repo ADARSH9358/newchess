@@ -83,8 +83,10 @@ io.on('connection', (socket) => {
             const mess="Sorry, room is full.Please try other room";
             socket.emit('roomFull', mess);
         }
-
-        socket.emit('initGame', roomState);
+        // if(roomState.players.black && roomState.players.white){
+            socket.emit('initGame', roomState);
+        // }
+        // console.log(`room state: ${roomState}`)
         socket.on('offer', (offer) => {
             socket.broadcast.emit('offer', offer);
         });
