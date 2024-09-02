@@ -1,4 +1,3 @@
-
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -264,7 +263,7 @@ function updateGameState(gameState, move) {
     return gameState;
 }
 
-let PORT=3000;
+let PORT=3001;
 server.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);
 });

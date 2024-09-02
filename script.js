@@ -133,7 +133,7 @@ function hangUp() {
 
 
 socket.on('initGame', (gameState) => {
-    console.log(gameState);
+    // console.log(gameState);
     board = gameState.board;
     renderBoard(board);
 
@@ -150,9 +150,9 @@ socket.on('updateBoard', (gameState) => {
     // let turnDiv=  document.querySelector('#turn')
     // document.getElementById("whosTurn").style.display = "block"
     let color = gameState.turn;
-    console.log(color);
+    // console.log(color);
     let ans = gameState.players[color].name;
-    console.log(ans);
+    // console.log(ans);
     // document.getElementById("whosTurn").innerHTML=`<div>It is ${ans} turn</div>`;
 
     possibleMoves = [];
@@ -165,7 +165,8 @@ socket.on('invalidMove', (data) => {
 });
 socket.on('gameOver', (data) => {
     gameState.winner = data.winner;
-    if (data.winner === userName) {
+    console.log("who won or loss",gameState.winner);
+    if (data.winner == playerColor) {
         window.location.href = 'gamewinner.html';
     }
     else {
@@ -178,8 +179,10 @@ socket.on('gameOver', (data) => {
 let opp = null;
 socket.on('opponentName', (opponentName) => {
     opp = opponentName;
-    renderBoard(board)
+    console.log("oppName : ",opponentName);
     document.querySelector("#Opponent").innerText = `Opponent : ${opponentName}`;
+    renderBoard(board)
+    
     // window.location.href = 'chess.html';
 
     // opponentDiv.classList.add('opponenthighlight');
@@ -205,7 +208,7 @@ function renderBoard(board) {
             if (board[row][col]) {
                 // Add piece to the cell
                 cell.innerHTML = `<span class="${board[row][col].type}">${getPieceSymbol(board[row][col])}</span>`;
-                console.log("opponent",opp);
+                // console.log("opponent",opp);
                 // Check if opponent exists and the game is not over
                 if (opp && !gameState.winner) {
                     if (board[row][col].color === playerColor) {
@@ -250,8 +253,8 @@ function selectPiece(row, col) {
     selectedPiece = { row, col };
     const piece = board[row][col];
     if (piece && piece.color === playerColor) {
-        console.log(piece);
-        console.log(row, col);
+        // console.log(piece);
+        // console.log(row, col);
         socket.emit('getPossibleMoves', { piece, position: selectedPiece });
     }
 }
@@ -267,7 +270,7 @@ function movePiece(row, col) {
             from: selectedPiece,
             to: { row, col }
         };
-        console.log(selectedPiece);
+        // console.log(selectedPiece);
         socket.emit('movePiece', move);
         selectedPiece = null;
         possibleMoves = [];
